@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 function Resume() {
     const [resumeData, setResumeData] = useState(null);
     const [loading, setLoading] = useState(true);
-
-    const pdfPath = `${import.meta.env.BASE_URL}docs/Resume/Kevin Wood Software Developer 2026.pdf`;
+    const characterToIgnore = '';  // The actual bullet character from the PDF
 
     useEffect(() => {
         // Load the pre-extracted resume data
@@ -26,75 +25,165 @@ function Resume() {
 
         return text.split('\n').map((line, index) => (
             <div key={index} className="resume-line">
-                {line.trim() || '\u00A0'} {/* Non-breaking space for empty lines */}
+                {line.trim() || '\u00A0'}
             </div>
         ));
     };
 
-    // Helper function to render skills with smart formatting
+    // Helper function to render skills with hierarchy
     const renderSkills = (text) => {
         if (!text) return 'Skills section not found';
 
-        const sections = [];
-        let currentSection = null;
+        const categories = [];
+        let currentCategory = null;
+        let currentSubCategory = null;
 
-        // Split by lines and process
-        const lines = text.split('\n');
+        const lines = text.split('\n').map(line => {
+            let trimmed = line.trim();
+            // Remove ALL occurrences of the character, not just at the start
+            while (trimmed.includes(characterToIgnore)) {
+                trimmed = trimmed.replace(characterToIgnore, '');
+            }
+            return trimmed.trim();
+        }).filter(line => line);
 
         lines.forEach((line) => {
-            const trimmedLine = line.trim();
-            if (!trimmedLine) return;
-
-            // Look for pattern "Word:" or "Word Word:" anywhere in the line (more flexible)
-            const headerMatch = trimmedLine.match(/([A-Za-z][\w\s-]*?):\s*(.*)/);
-
-            if (headerMatch) {
-                // Found a header (e.g., "Programming:", "Web Technologies:", "Problem-Solving:")
-                const header = headerMatch[1].trim();
-                const restOfLine = headerMatch[2].trim();
-
-                // Save previous section
-                if (currentSection) {
-                    sections.push(currentSection);
+            // Check if it's a sub-category (Experienced: or Familiar:)
+            const subMatch = line.match(/^(Experienced|Familiar):\s*(.*)$/i);
+            
+            if (subMatch) {
+                // Save previous sub-category if exists
+                if (currentSubCategory && currentCategory) {
+                    currentCategory.subCategories.push(currentSubCategory);
                 }
 
-                // Start new section
-                currentSection = {
-                    header,
+                const subName = subMatch[1].trim();
+                const restOfLine = subMatch[2].trim();
+
+                currentSubCategory = {
+                    name: subName,
                     items: []
                 };
 
-                // If there's content after the colon, split by comma
+                // Add items after the colon if present (as comma-separated)
                 if (restOfLine) {
                     const items = restOfLine.split(',').map(item => item.trim()).filter(item => item);
-                    currentSection.items.push(...items);
+                    currentSubCategory.items.push(...items);
                 }
-            } else if (currentSection) {
-                // Continuation line - split by comma and add to current section
-                const items = trimmedLine.split(',').map(item => item.trim()).filter(item => item);
-                currentSection.items.push(...items);
-            } else {
-                // No header yet, treat as standalone items
-                const items = trimmedLine.split(',').map(item => item.trim()).filter(item => item);
-                if (items.length > 0) {
-                    sections.push({ header: null, items });
+            }
+            // Check if it's a main category (has colon but not Experienced/Familiar)
+            else if (line.includes(':')) {
+                const match = line.match(/^([^:]+):\s*(.*)$/);
+                if (match) {
+                    // Save previous category
+                    if (currentSubCategory && currentCategory) {
+                        currentCategory.subCategories.push(currentSubCategory);
+                    }
+                    if (currentCategory) {
+                        categories.push(currentCategory);
+                    }
+
+                    const categoryName = match[1].trim();
+                    const restOfLine = match[2].trim();
+
+                    currentCategory = {
+                        name: categoryName,
+                        subCategories: [],
+                        items: []
+                    };
+                    currentSubCategory = null;
+
+                    // If there's content after colon, add it
+                    if (restOfLine) {
+                        currentCategory.items.push(restOfLine);
+                    }
+                }
+            }
+            // Check if it's a main category without colon (like "Programming")
+            // Long lines (>40 chars) should also be treated as top-level categories
+            else if (!currentSubCategory || line.length > 40) {
+                // Save previous category
+                if (currentSubCategory && currentCategory) {
+                    currentCategory.subCategories.push(currentSubCategory);
+                }
+                if (currentCategory) {
+                    categories.push(currentCategory);
+                }
+
+                currentCategory = {
+                    name: line,
+                    subCategories: [],
+                    items: []
+                };
+                currentSubCategory = null;
+            }
+            // Otherwise, decide if it's an item or a new top-level category
+            else {
+                // Short lines are items; longer descriptive lines are categories
+                const looksLikeItem = line.length < 20 && !line.includes(' through ') && !line.includes(' and ');
+                
+                if (looksLikeItem) {
+                    // It's an item
+                    if (currentSubCategory) {
+                        currentSubCategory.items.push(line);
+                    } else if (currentCategory) {
+                        currentCategory.items.push(line);
+                    }
+                } else {
+                    // It's a new top-level category
+                    if (currentSubCategory && currentCategory) {
+                        currentCategory.subCategories.push(currentSubCategory);
+                        currentSubCategory = null;
+                    }
+                    if (currentCategory) {
+                        categories.push(currentCategory);
+                    }
+                    
+                    currentCategory = {
+                        name: line,
+                        subCategories: [],
+                        items: []
+                    };
                 }
             }
         });
 
-        // Don't forget the last section
-        if (currentSection) {
-            sections.push(currentSection);
+        // Don't forget the last category and sub-category
+        if (currentSubCategory && currentCategory) {
+            currentCategory.subCategories.push(currentSubCategory);
+        }
+        if (currentCategory) {
+            categories.push(currentCategory);
         }
 
         return (
             <ul className="skill-list-main">
-                {sections.map((section, sectionIndex) => (
-                    <li key={sectionIndex} className="skill-section">
-                        {section.header && <span className="skill-header">{section.header}</span>}
-                        {section.items.length > 0 && (
+                {categories.map((category, catIndex) => (
+                    <li key={catIndex} className="skill-category">
+                        <span className="skill-header">{category.name}</span>
+                        
+                        {/* Render sub-categories with items as separate bullets */}
+                        {category.subCategories.length > 0 && (
+                            <ul className="skill-subcategory-list">
+                                {category.subCategories.map((subCat, subIndex) => (
+                                    <li key={subIndex} className="skill-subcategory">
+                                        <span className="skill-subheader">{subCat.name}</span>
+                                        {subCat.items.length > 0 && (
+                                            <ul className="skill-items-list">
+                                                {subCat.items.map((item, itemIndex) => (
+                                                    <li key={itemIndex}>{item}</li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+
+                        {/* Render direct items as separate list items with bullets */}
+                        {category.items.length > 0 && (
                             <ul className="skill-list-nested">
-                                {section.items.map((item, itemIndex) => (
+                                {category.items.map((item, itemIndex) => (
                                     <li key={itemIndex}>{item}</li>
                                 ))}
                             </ul>
@@ -104,6 +193,11 @@ function Resume() {
             </ul>
         );
     };
+
+    // Build the PDF path dynamically from the stored filename
+    const pdfPath = resumeData?.pdfFileName 
+        ? `${import.meta.env.BASE_URL}docs/Resume/${resumeData.pdfFileName}`
+        : `${import.meta.env.BASE_URL}docs/Resume/resume.pdf`;
 
     return (
         <div className="resume">
@@ -123,7 +217,7 @@ function Resume() {
                     ) : resumeData ? (
                         <>
                             <div className="resume-section">
-                                <h2>Education</h2>
+                                <h2>Education and Professional Development</h2>
                                 <div className="resume-item">
                                     {renderText(resumeData.education)}
                                 </div>

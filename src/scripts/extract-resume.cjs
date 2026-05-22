@@ -1,11 +1,24 @@
 const fs = require('fs');
 const path = require('path');
 
-const pdfPath = path.join(__dirname, '../../docs/Resume/Kevin Wood Software Developer 2026.pdf');
+const resumeDir = path.join(__dirname, '../../docs/Resume');
 const outputPath = path.join(__dirname, '../data/resume-data.json');
+const characterToIgnore = String.fromCharCode(61623);  // The bullet character
+const indentCharacter = String.fromCharCode(61607);   // The indent character
 
 async function extractResumeData() {
   try {
+    // Find the first PDF file in the Resume directory
+    const files = fs.readdirSync(resumeDir);
+    const pdfFile = files.find(file => file.toLowerCase().endsWith('.pdf'));
+    
+    if (!pdfFile) {
+      throw new Error('No PDF file found in docs/Resume directory');
+    }
+    
+    const pdfPath = path.join(resumeDir, pdfFile);
+    console.log(`📄 Found resume PDF: ${pdfFile}`);
+    
     // Use dynamic import for ESM module
     const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
     
@@ -38,32 +51,46 @@ async function extractResumeData() {
       });
       fullText += '\n\n'; // Double newline between pages
     }
-    
-    // Debug: Show what we extracted
-    console.log('--- Extracted Text (first 1000 chars) ---');
-    console.log(fullText.substring(0, 1000));
-    console.log('--- End Preview ---\n');
 
     // Extract Education section
-    const educationMatch = fullText.match(/Education:(.*?)(?=(Skills:|Experience:|Certifications:|$))/is);
+    const educationMatch = fullText.match(/\bEducation\s+and Professional Development\s+(.*?)(?=(Summary of Qualifications|Professional Experience|Certifications|$))/is);
     let education = educationMatch ? educationMatch[1].trim() : '';
     
-    // Extract Skills section
-    const skillsMatch = fullText.match(/Skills:(.*?)(?=(Education:|Experience:|Certifications:|$))/is);
+    // Extract Skills from Summary of Qualifications section
+    const skillsMatch = fullText.match(/Summary of Qualifications\s+(.*?)(?=(Education|Professional Experience|Certifications|Work Experience|$))/is);
     let skills = skillsMatch ? skillsMatch[1].trim() : '';
     
-    // Clean up formatting: normalize whitespace but preserve newlines
-    education = education.replace(/[ \t]+/g, ' ').replace(/\n\s+/g, '\n').trim();
-    skills = skills.replace(/[ \t]+/g, ' ').replace(/\n\s+/g, '\n').trim();
+    // Process skills to remove bullets and special characters
+    if (skills) {
+      let lines = skills.split('\n');
+      lines = lines.map((line) => {
+        let cleaned = line;
+        // Remove special PDF characters
+        while (cleaned.includes(characterToIgnore)) {
+          cleaned = cleaned.replace(characterToIgnore, '');
+        }
+        while (cleaned.includes(indentCharacter)) {
+          cleaned = cleaned.replace(indentCharacter, '');
+        }
+        // Remove "o  " bullet pattern
+        cleaned = cleaned.replace(/^o\s\s+/, '');
+        
+        return cleaned.trim();
+      });
+      skills = lines.join('\n');
+      
+      // Normalize line breaks
+      skills = skills.replace(/\n\s*\n+/g, '\n');
+      skills = skills.trim();
+    }
     
-    console.log('Education match found:', !!educationMatch);
-    console.log('Education content length:', education.length);
-    console.log('Skills match found:', !!skillsMatch);
-    console.log('Skills content length:', skills.length);
+    // Clean up education formatting
+    education = education.replace(/[ \t]+/g, ' ').replace(/\n\s+/g, '\n').trim();
 
     const resumeData = {
       education,
       skills,
+      pdfFileName: pdfFile,
       lastUpdated: new Date().toISOString()
     };
 
@@ -74,7 +101,7 @@ async function extractResumeData() {
     }
 
     fs.writeFileSync(outputPath, JSON.stringify(resumeData, null, 2));
-    console.log('\n✅ Resume data extracted successfully!');
+    console.log('✅ Resume data extracted successfully!');
   } catch (error) {
     console.error('❌ Error extracting resume data:', error);
     process.exit(1);

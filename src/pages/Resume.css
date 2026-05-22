@@ -35,7 +35,7 @@
   padding: 4rem 2rem;
   max-width: 900px;
   margin: 0 auto;
-  text-align: left; /* Force left alignment */
+  text-align: left;
 }
 
 .resume-section {
@@ -70,17 +70,17 @@
   text-align: left;
 }
 
-/* Skills section formatting - nested bullet lists */
+/* Skills section - three-level hierarchy */
 .skill-list-main {
   list-style: disc;
   margin-left: 0;
   margin-top: 0;
   margin-bottom: 0;
-  padding-left: 1.5rem; /* One tab from container edge */
+  padding-left: 1.5rem;
   text-align: left;
 }
 
-.skill-section {
+.skill-category {
   margin-bottom: 1rem;
   text-align: left;
 }
@@ -94,12 +94,39 @@
   text-align: left;
 }
 
+/* Sub-categories with "o" bullets */
+.skill-subcategory-list {
+  list-style: circle;
+  margin-left: 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  padding-left: 2rem;
+  text-align: left;
+}
+
+.skill-subcategory {
+  margin-bottom: 0.4rem;
+  text-align: left;
+}
+
+.skill-subheader {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.skill-items-inline {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Direct items under categories */
 .skill-list-nested {
   list-style: circle;
   margin-left: 0;
   margin-top: 0.5rem;
   margin-bottom: 0;
-  padding-left: 2rem; /* About two tabs from parent bullet */
+  padding-left: 2rem;
   text-align: left;
 }
 
@@ -108,4 +135,17 @@
   margin-bottom: 0.4rem;
   line-height: 1.6;
   text-align: left;
+}
+
+.skill-items-list {
+  list-style: square;
+  margin-left: 0;
+  margin-top: 0.3rem;
+  padding-left: 2rem;
+}
+
+.skill-items-list li {
+  color: var(--text-secondary);
+  margin-bottom: 0.3rem;
+  line-height: 1.6;
 }
