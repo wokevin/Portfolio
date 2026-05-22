@@ -1,0 +1,43 @@
+.project-detail {
+  min-height: calc(100vh - 200px);
+  background-color: var(--bg-primary);
+}
+
+.project-detail-professional {
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+  color: var(--text-light);
+  padding: 3rem 2rem 2rem;
+}
+
+.back-link {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.project-detail-professional h1 {
+  font-size: 3rem;
+}
+
+.project-detail-content {
+  padding: 4rem 2rem;
+}
+
+.content-section {
+  max-width: 900px;
+  margin: 0 auto 3rem;
+}
+
+.content-section h2 {
+  color: var(--text-primary);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 3px solid var(--accent-color);
+  padding-bottom: 0.5rem;
+}
+
+.content-section p {
+  color: var(--text-secondary);
+}
