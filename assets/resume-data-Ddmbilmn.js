@@ -14,4 +14,4 @@ Backbone.js
 JQuery
 ASP.NET
 XML
-Problem solving through requirements collection, algorithms analysis and solutions design`,pdfFileName:`Kevin Wood Software Developer in Test.pdf`,lastUpdated:`2026-05-22T05:08:34.308Z`};export{e as default};
+Problem solving through requirements collection, algorithms analysis and solutions design`,pdfFileName:`Kevin Wood Software Developer in Test.pdf`,lastUpdated:`2026-05-22T18:07:42.653Z`};export{e as default};
