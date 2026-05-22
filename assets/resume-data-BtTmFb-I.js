@@ -1,1 +1,0 @@
-var e={education:``,skills:``,pdfFileName:`Kevin Wood Software Developer in Test.pdf`,lastUpdated:`2026-05-22T02:03:24.553Z`};export{e as default};
