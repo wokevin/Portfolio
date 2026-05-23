@@ -17,8 +17,8 @@ function About() {
               <h2>My Journey in Computer Science</h2>
               <p>
                 I'm a passionate Computer Science student with a deep love for technology and problem-solving.
-                              My journey into programming began in the 1980's with inputting machine code for my computers - a Timex Sinclair and Commodore 64,
-                              and while that was extremely annoying it got me wondering how you could get a computer to do what you wanted, and I've been constantly learning and growing my skills across various domains since.
+                My journey into programming began in the 1980's with inputting machine code for my computers - a Timex Sinclair and Commodore 64, from a magazine to store on cassette tapes,
+                   and while that was extremely annoying it got me wondering how you could get a computer to do what you wanted, and I've been constantly learning and growing my skills across various domains since.
               </p>
 
               <h2>Technical Interests</h2>
@@ -32,11 +32,11 @@ function About() {
               <div className="values-grid">
                 <div className="value-card">
                   <h3>🎯 Continuous Learning</h3>
-                  <p>Technology evolves rapidly, and I'm committed to staying current.</p>
+                  <p>Technology evolves rapidly, and I'm committed to staying current.  The Day you stop learning is the day you die.</p>
                 </div>
                 <div className="value-card">
                   <h3>🤝 Collaboration</h3>
-                  <p>Great software is built by great teams.</p>
+                  <p>Great software is built by great teams.  Alone we can do so little; together we can do so much.</p>
                 </div>
               </div>
             </div>

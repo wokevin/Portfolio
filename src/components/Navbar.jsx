@@ -9,7 +9,7 @@ function Navbar() {
     <nav className="navbar">
       <div className="nav-container">
         <Link to="/" className="nav-logo">
-          Your Name
+          Kevin Wood's Portfolio
         </Link>
 
         <div className={`nav-menu ${isOpen ? 'active' : ''}`}>

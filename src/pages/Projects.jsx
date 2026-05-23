@@ -15,20 +15,48 @@ function Projects() {
         if (!response.ok) throw new Error('Failed to fetch repos');
         return response.json();
       })
-      .then(data => {
-        // Filter out forks and private repos, map to our format
-        const publicRepos = data
-          .filter(repo => !repo.fork && !repo.private)
-          .map(repo => ({
-            id: repo.id,
-            title: repo.name,
-            description: repo.description || 'No description available',
-            language: repo.language,
-            stars: repo.stargazers_count,
-            githubLink: repo.html_url,
-            liveLink: repo.homepage || null,
-          }));
-        setProjects(publicRepos);
+      .then(async data => {
+        // Filter out forks and private repos
+        const publicRepos = data.filter(repo => !repo.fork && !repo.private);
+        
+        // Fetch READMEs for each repo
+        const reposWithDescriptions = await Promise.all(
+          publicRepos.map(async repo => {
+            let description = repo.description || '';
+            
+            // If no description, try to get it from README
+            if (!description) {
+              try {
+                const readmeResponse = await fetch(`https://api.github.com/repos/${repo.full_name}/readme`, {
+                  headers: { 'Accept': 'application/vnd.github.v3.raw' }
+                });
+                
+                if (readmeResponse.ok) {
+                  const readmeText = await readmeResponse.text();
+                  const lines = readmeText.split('\n').filter(line => line.trim());
+                  
+                  // Find first meaningful paragraph
+                  const firstParagraph = lines.find(line => {
+                    const trimmed = line.trim();
+                    return !trimmed.startsWith('#') && !trimmed.startsWith('!') &&  !trimmed.startsWith('[') && trimmed.length > 20;
+                  });
+                  
+                  if (firstParagraph) {
+                    description = firstParagraph.substring(0, 600);
+                  } else {
+                    description = 'See project for details';
+                  }
+                }
+              } catch (e) {
+                description = 'No description available';
+              }
+            }
+            
+            return { id: repo.id, title: repo.name, description, language: repo.language, stars: repo.stargazers_count, githubLink: repo.html_url, liveLink: repo.homepage || null, };
+          })
+        );
+        
+        setProjects(reposWithDescriptions);
         setLoading(false);
       })
       .catch(err => {
