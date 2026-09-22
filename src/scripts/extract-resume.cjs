@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const resumeDir = path.join(__dirname, '../../docs/Resume');
+const resumeDir = path.join(__dirname, '../../public/docs/Resume');
 const outputPath = path.join(__dirname, '../data/resume-data.json');
 const characterToIgnore = String.fromCharCode(61623);  // The bullet character
 const indentCharacter = String.fromCharCode(61607);   // The indent character
