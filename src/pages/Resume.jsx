@@ -195,8 +195,8 @@ function Resume() {
     };
 
     // Build the PDF path dynamically from the stored filename
-    const pdfPath = resumeData?.pdfFileName 
-        ? `${import.meta.env.BASE_URL}docs/Resume/${resumeData.pdfFileName}`
+    const pdfPath = resumeData?.pdfEncodedFileName 
+        ? `${import.meta.env.BASE_URL}docs/Resume/${resumeData.pdfEncodedFileName}`
         : `${import.meta.env.BASE_URL}docs/Resume/resume.pdf`;
 
     return (
