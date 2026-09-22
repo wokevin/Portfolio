@@ -91,6 +91,7 @@ async function extractResumeData() {
       education,
       skills,
       pdfFileName: pdfFile,
+      pdfEncodedFileName: encodeURIComponent(pdfFile),
       lastUpdated: new Date().toISOString()
     };
 
