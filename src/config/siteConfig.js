@@ -3,7 +3,7 @@ const siteConfig = {
   personal: {
     name: 'Kevin Wood',
     title: 'Software Developer',
-    email: 'kevin.wood@example.com', 
+    email: 'your-actual-email@gmail.com', 
   },
   social: {
     github: 'https://github.com/wokevin',
