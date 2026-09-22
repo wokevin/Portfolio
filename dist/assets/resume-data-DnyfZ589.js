@@ -13,4 +13,4 @@ Backbone.js
 JQuery
 ASP.NET
 XML
-Problem solving through requirements collection, algorithms analysis and solutions design`,pdfFileName:`Kevin Wood CodeForAmerica Software Engineering Manager Resume.pdf`,pdfEncodedFileName:`Kevin%20Wood%20CodeForAmerica%20Software%20Engineering%20Manager%20Resume.pdf`,lastUpdated:`2026-09-22T21:04:18.841Z`};export{e as default};
+Problem solving through requirements collection, algorithms analysis and solutions design`,pdfFileName:`Kevin Wood CodeForAmerica Software Engineering Manager Resume.pdf`,pdfEncodedFileName:`Kevin%20Wood%20CodeForAmerica%20Software%20Engineering%20Manager%20Resume.pdf`,lastUpdated:`2026-09-22T21:16:12.935Z`};export{e as default};
